@@ -3,6 +3,7 @@
 const quizContainer = document.getElementById('quiz');
 const resultsContainer = document.getElementById('results');
 const submitButton = document.getElementById('submit');
+const apiKey = 'sk-bPzroDCYEoT00EcXEwKICeT3BlbkFJu6OFsumKCwDFYEsrNeA0'; // Replace with your actual API key
 let QuestionsData ;
 
 function generateQuiz(quizData) {
@@ -50,30 +51,64 @@ submitButton.addEventListener('click',  function(event) {
     const formData = saveFormData();
 
     console.log( formData);
-    getResults();
+    var resultsdata =[];
+    QuestionsData.forEach((currentQuestion, questionNumber) => {
+        currentQuestion['answer']=formData["question"+questionNumber];
+        resultsdata.push(currentQuestion);
+       
+    });
+    console.log(resultsdata);
+     getResults(resultsdata);
+
 
     
 
        
     // Simulated delay of 1 second (1000 milliseconds)
 });
-function getResults() {
+function getResults(answerData) {
 
-    fetch('CareerPath.json')
-    .then(response => response.json())
+    const data = {
+        model: "gpt-3.5-turbo",
+        messages: [{ role: "user", content: "task : suggest few relevant career path based on data min 3 \n data :"+ JSON.stringify( answerData ) +"  \n context : you have generated this question from https: //www.onetonline.org/ \n persona : career counsellor \n output : give in below json format  [ { `skill`: ``, `why` : `` , `Career_Outlook` : ``}]" }],
+        temperature: 0.7,
+        };
+        
+        try {
+        fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify(data),
+        }).then(response => (response.json()))
     .then(data => {
+        console.log("d2");
+        console.log(data);
+        printfinal(JSON.parse((data.choices[0].message.content).replace(/'/g, '"')));
+    }
+    )
+}
+finally{
+    console.log('done1');
+}
+};
+
+
+function printfinal(data)
+{
+   
         data.forEach(item => {
             const resultElement = document.createElement('div');
             resultElement.classList.add('result');
-            resultElement.innerHTML = `
-                <h3>${item.skill}</h3>
-                <p>${item.why}</p>
-            `;
-            resultsContainer.appendChild(resultElement);
+            resultElement.innerHTML = '<lable> skill :' + item.skill +'</lable><br> <lable> why :'+ item.why + '</lable> <br> <lable> Career Outlook :'+ item.Career_Outlook + '</lable>';
+            resultsContainer.appendChild(resultElement); 
+            
         });
-    })
-    .catch(error => console.error('Please try again later:', error));
+    
 }
+
 function saveFormData() {
     const formData = {}; // Initialize an empty object to store form data
 
@@ -93,7 +128,7 @@ function saveFormData() {
     return formData; // Return the collected form data object
 };
 function callChatGPTAPI() {
-    const apiKey = 'sk-bPzroDCYEoT00EcXEwKICeT3BlbkFJu6OFsumKCwDFYEsrNeA0'; // Replace with your actual API key
+    
 
 const data = {
 model: "gpt-3.5-turbo",
@@ -112,6 +147,8 @@ fetch('https://api.openai.com/v1/chat/completions', {
 }).then(response => response.json())
 .then(data => {
     // Call a function to use the fetched data
+    console.log("d1");
+    console.log(data);
     generateQuiz(JSON.parse((data.choices[0].message.content).replace(/'/g, '"')));
 });
 }
@@ -119,4 +156,3 @@ finally{
   console.log('done');
 }
 }
-
