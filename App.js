@@ -1,106 +1,18 @@
-const quizData = [
-   
-    
-        
-          {
-            question: "Are you more interested in working with people, data/numbers, or things?",
-            type : "Objective",
-            options: [
-              "People",
-              "Data/Numbers",
-              "Things"
-              
-            ]
-          },
-          {
-            question: "Do you enjoy solving problems and figuring out how things work?",
-            type : "Objective",
-            
-            options: [
-              "Yes",
-              "No"
-            ]
-          },
-          {
-            question: "Are you interested in using creativity or artistic skills in your work?",
-            type : "Objective",
-            options: [
-              "Yes",
-              "No"
-            ]
-          },
-          {
-            question: "Would you prefer a job that involves working outdoors or indoors?",
-            type : "Objective",
-            options: [
-              "Outdoors",
-              "Indoors"
-            ]
-          },
-          {
-            question: "Do you like to work with computers or technology?",
-            type : "Objective",
-            options: [
-              "Yes",
-              "No"
-            ]
-          },
-          {
-            question: "Are you interested in helping others improve their health or well-being?",
-            type : "Objective",
-            options: [
-              "Yes",
-              "No"
-            ]
-          },
-          {
-            question: "Do you enjoy planning and organizing events or projects?",
-            type : "Objective",
-            options: [
-              "Yes",
-              "No"
-            ]
-          },
-          {
-            question: "Would you like a job where you can travel frequently?",
-            type : "Objective",
-            options: [
-              "Yes",
-              "No"
-            ]
-          },
-          {
-            question: "Are you interested in learning about different cultures and languages?",
-            type : "Objective",
-            options: [
-              "Yes",
-              "No"
-            ]
-          },
-          {
-            question: "Do you prefer working independently or as part of a team?",
-            type : "Objective",
-            options: [
-              "Independently",
-              "As part of a team"
-            ]
-          }
-        
-      
-  
-];
+
 
 const quizContainer = document.getElementById('quiz');
 const resultsContainer = document.getElementById('results');
 const submitButton = document.getElementById('submit');
+let QuestionsData ;
 
-function generateQuiz() {
+function generateQuiz(quizData) {
     const output = [];
-
+    console.log(quizData);
+    QuestionsData = quizData;
     quizData.forEach((currentQuestion, questionNumber) => {
         output.push(`<div class="question">${currentQuestion.question}</div>`);
 
-        if (currentQuestion.type === "Objective") {
+        
             const options = [];
 
             for (let i = 0; i < currentQuestion.options.length; i++) {
@@ -114,11 +26,7 @@ function generateQuiz() {
             
 
             output.push(`<div class="options">${options.join('')}</div>`);
-        } else if (currentQuestion.type === "subjective") {
-            output.push(
-                `<textarea id="answer${questionNumber}" placeholder="Enter your answer"></textarea>`
-            );
-        }
+       
     });
 
     quizContainer.innerHTML = output.join('');
@@ -142,6 +50,14 @@ submitButton.addEventListener('click',  function(event) {
     const formData = saveFormData();
 
     console.log( formData);
+    getResults();
+
+    
+
+       
+    // Simulated delay of 1 second (1000 milliseconds)
+});
+function getResults() {
 
     fetch('CareerPath.json')
     .then(response => response.json())
@@ -157,12 +73,7 @@ submitButton.addEventListener('click',  function(event) {
         });
     })
     .catch(error => console.error('Please try again later:', error));
-
-    
-
-       
-    // Simulated delay of 1 second (1000 milliseconds)
-});
+}
 function saveFormData() {
     const formData = {}; // Initialize an empty object to store form data
 
@@ -186,7 +97,7 @@ function callChatGPTAPI() {
 
 const data = {
 model: "gpt-3.5-turbo",
-messages: [{ role: "user", content: "task : create few questions min of 20 and based on the answer suggest career path for 9 or 10 grade \n context : use the knowledge from https: //www.onetonline.org/ \n output : give output in below json format json format: [{'question':'','answer':''}] persona : career counsellor" }],
+messages: [{ role: "user", content: "task : create few  mcq questions min 10 and based on the answer suggest career path for 9 or 10 grade \n context : use the knowledge from https: //www.onetonline.org/ \n output : give output in below json format json format: [{'question':'','options':['','']}] persona : career counsellor" }],
 temperature: 0.7,
 };
 
